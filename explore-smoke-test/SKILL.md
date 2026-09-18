@@ -23,8 +23,8 @@ Resolve these from the operator's request; record the effective values in the re
 |---|---|
 | `REPO_ROOT` | Current workspace. The tested sessions read only this repository. |
 | `PROBE_SET` | At least 5 probes; record each with ID, question, tolerance rule, and reference evidence. |
-| `RUNNER` | One fresh session per probe set. Prefer one-shot `hermes chat -q "..."`; a new WebUI session is equivalent. Never reuse a session across probe sets. |
-| `TOOL_POLICY` | Read-only: `read_file`/`search_files` and read-only commands permitted; no writes, edits, git mutations, tests, builds, or network. State this in the injected prompt. |
+| `RUNNER` | One fresh session per probe set in whichever agent harness is under test — a one-shot CLI run, a brand-new interactive session, or its equivalent. Never reuse a session across probe sets. |
+| `TOOL_POLICY` | Read-only: file read/search tools and read-only commands permitted; no writes, edits, git mutations, tests, builds, or network. State this in the injected prompt. |
 | `OUTPUT` | `EXPLORE_SMOKE_TEST.md`, the sole deliverable. |
 
 ## Operating boundaries
@@ -99,4 +99,4 @@ Then: solved/total, unverified and contaminated counts, runner/model identity, s
 
 ## Source design
 
-Derived from the LocalCode-100K repository coding benchmark design, section 11 ("Separate OpenCode/Hermes agent track"): optional read-only Explore probes run as separate fresh sessions, asking for concrete outputs, dependency chains, or canonical IDs with reference-derived expected answers; no reward for unsupported prose; probe answers never fed into the coding run.
+Derived from the LocalCode-100K repository coding benchmark design, section 11 (separate agent track): optional read-only Explore probes run as separate fresh sessions, asking for concrete outputs, dependency chains, or canonical IDs with reference-derived expected answers; no reward for unsupported prose; probe answers never fed into the coding run.
