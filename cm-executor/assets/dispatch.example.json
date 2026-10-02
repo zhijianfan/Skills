@@ -1,0 +1,203 @@
+{
+  "protocol": "cdag/1.0",
+  "kind": "dispatch",
+  "project_id": "inventory-demo",
+  "example": true,
+  "dispatch_id": "dispatch.inventory.implement",
+  "attempt_id": "attempt.inventory.implement.1",
+  "packet": {
+    "protocol": "cdag/1.0",
+    "kind": "packet",
+    "project_id": "inventory-demo",
+    "example": true,
+    "task_id": "inventory.implement",
+    "packet_revision": 1,
+    "graph_revision": 1,
+    "role": "implementer",
+    "group_id": "inventory",
+    "parent_task": null,
+    "objective": "Implement inventory read normal, empty, and unavailable behavior without mutations.",
+    "requirement_ids": [
+      "INV-READ"
+    ],
+    "prerequisites": [
+      {
+        "name": "api",
+        "class": "contract",
+        "source": {
+          "artifact": {
+            "artifact_id": "inventory-api.v1",
+            "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+          }
+        },
+        "required_gates": [
+          "contract.accepted"
+        ],
+        "reason": "api provides the explicit pinned contract prerequisite for this activity."
+      },
+      {
+        "name": "baseline",
+        "class": "context",
+        "source": {
+          "artifact": {
+            "artifact_id": "baseline",
+            "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+          }
+        },
+        "required_gates": [],
+        "reason": "baseline provides the explicit pinned context prerequisite for this activity."
+      },
+      {
+        "name": "requirements",
+        "class": "context",
+        "source": {
+          "artifact": {
+            "artifact_id": "requirements",
+            "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+          }
+        },
+        "required_gates": [],
+        "reason": "requirements provides the explicit pinned context prerequisite for this activity."
+      },
+      {
+        "name": "environment",
+        "class": "context",
+        "source": {
+          "artifact": {
+            "artifact_id": "environment",
+            "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+          }
+        },
+        "required_gates": [],
+        "reason": "environment provides the explicit pinned context prerequisite for this activity."
+      }
+    ],
+    "baseline_input": "baseline",
+    "workspace_policy": {
+      "mode": "isolated-write",
+      "read_paths": [
+        "contracts/**",
+        "src/**",
+        "tests/**"
+      ],
+      "write_paths": [
+        "src/inventory/**",
+        "tests/inventory/**"
+      ],
+      "protected_paths": [
+        "contracts/**"
+      ]
+    },
+    "resources": [],
+    "requested_capabilities": [
+      "read_artifacts",
+      "write_artifacts",
+      "emit_result",
+      "edit_workspace",
+      "run_commands"
+    ],
+    "delegation": "none",
+    "outputs": [
+      {
+        "name": "source",
+        "artifact_type": "source",
+        "required": true
+      }
+    ],
+    "checks": [
+      {
+        "check_id": "local-unit",
+        "method": "test",
+        "subject": "output:source",
+        "command": "python -m unittest discover -s tests/inventory",
+        "expected": "Check the named contract/requirement behavior on this exact subject; example commands require real repository adaptation.",
+        "required": true
+      }
+    ],
+    "acceptance_policy": {
+      "artifact_id": "policy.v1",
+      "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+    },
+    "recovery": {
+      "checkpoint_uri": "workspace://inventory.implement/checkpoint.md",
+      "retry_limit": 2,
+      "escalate_on": [
+        "Input unavailable or revoked",
+        "No progress across materially distinct attempts"
+      ]
+    }
+  },
+  "packet_sha256": "5766af39462e7ea961bd59cb7498352b77dc94f03d581e4f7a37ef1783778e2c",
+  "recipient": {
+    "agent_id": "agent.inventory.implement",
+    "role": "implementer",
+    "skill": "cm-executor",
+    "model": "example-model-resolve-before-live-use"
+  },
+  "issued_at": "2026-10-01T00:50:00Z",
+  "lease": {
+    "lease_id": "lease.inventory.implement.1",
+    "fence": 1,
+    "expires_at": "2026-10-01T01:50:00Z"
+  },
+  "workspace": {
+    "uri": "workspace://inventory.implement/attempt-1",
+    "baseline": {
+      "artifact_id": "baseline",
+      "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+    }
+  },
+  "inputs": [
+    {
+      "name": "api",
+      "artifact": {
+        "artifact_id": "inventory-api.v1",
+        "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+      },
+      "attestations": [
+        {
+          "artifact_id": "contract.accepted",
+          "sha256": "8a7effbb3399c9573468a4049ac8a120f71be74da172fad1a737b5a5a4787fd7"
+        }
+      ]
+    },
+    {
+      "name": "baseline",
+      "artifact": {
+        "artifact_id": "baseline",
+        "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+      },
+      "attestations": []
+    },
+    {
+      "name": "requirements",
+      "artifact": {
+        "artifact_id": "requirements",
+        "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+      },
+      "attestations": []
+    },
+    {
+      "name": "environment",
+      "artifact": {
+        "artifact_id": "environment",
+        "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+      },
+      "attestations": []
+    }
+  ],
+  "grant": {
+    "capabilities": [
+      "read_artifacts",
+      "write_artifacts",
+      "emit_result",
+      "edit_workspace",
+      "run_commands"
+    ],
+    "grant_ref": {
+      "artifact_id": "authority",
+      "sha256": "4310cff7d45d1169601e9327e6fdc1627a756a3fdbc14064794acf627e871585"
+    }
+  },
+  "result_uri": "workspace://inventory.implement/attempt-1/result.json"
+}

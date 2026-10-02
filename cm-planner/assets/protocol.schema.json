@@ -1,0 +1,1740 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cdag:protocol:1.0",
+  "title": "CDAG 1.0 canonical protocol",
+  "description": "Original protocol for this skill pack, not an industry standard.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/packet"
+    },
+    {
+      "$ref": "#/$defs/dispatch"
+    },
+    {
+      "$ref": "#/$defs/result"
+    },
+    {
+      "$ref": "#/$defs/artifact"
+    },
+    {
+      "$ref": "#/$defs/evidence"
+    },
+    {
+      "$ref": "#/$defs/attestation"
+    },
+    {
+      "$ref": "#/$defs/policy"
+    },
+    {
+      "$ref": "#/$defs/graph"
+    },
+    {
+      "$ref": "#/$defs/change_request"
+    },
+    {
+      "$ref": "#/$defs/event"
+    }
+  ],
+  "$defs": {
+    "artifact_ref": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "issuer": {
+      "type": "object",
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "role": {
+          "enum": [
+            "architect",
+            "orchestrator",
+            "domain-lead",
+            "scheduler",
+            "implementer",
+            "reviewer",
+            "verifier",
+            "integrator",
+            "diagnostician"
+          ]
+        }
+      },
+      "required": [
+        "agent_id",
+        "role"
+      ],
+      "additionalProperties": false
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "baseline": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/artifact_ref"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact_ref"
+          },
+          "minItems": 0
+        },
+        "policy": {
+          "$ref": "#/$defs/artifact_ref"
+        },
+        "environment": {
+          "$ref": "#/$defs/artifact_ref"
+        }
+      },
+      "required": [
+        "baseline",
+        "inputs",
+        "policy",
+        "environment"
+      ],
+      "additionalProperties": false
+    },
+    "issue": {
+      "type": "object",
+      "properties": {
+        "issue_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "category": {
+          "enum": [
+            "infrastructure",
+            "implementation",
+            "contract",
+            "product",
+            "authority",
+            "protocol",
+            "integration",
+            "verification"
+          ]
+        },
+        "severity": {
+          "enum": [
+            "blocking",
+            "major",
+            "minor",
+            "info"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+          },
+          "minItems": 0
+        },
+        "affected_tasks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+          },
+          "minItems": 0
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact_ref"
+          },
+          "minItems": 0
+        },
+        "requested_action": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "issue_id",
+        "category",
+        "severity",
+        "summary",
+        "requirement_ids",
+        "affected_tasks",
+        "evidence_refs",
+        "requested_action"
+      ],
+      "additionalProperties": false
+    },
+    "check": {
+      "type": "object",
+      "properties": {
+        "check_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "method": {
+          "enum": [
+            "analysis",
+            "test",
+            "review",
+            "build",
+            "integration",
+            "approval"
+          ]
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expected": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "check_id",
+        "method",
+        "subject",
+        "command",
+        "expected",
+        "required"
+      ],
+      "additionalProperties": false
+    },
+    "input_source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "artifact": {
+              "$ref": "#/$defs/artifact_ref"
+            }
+          },
+          "required": [
+            "artifact"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "producer_task": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+            },
+            "output_name": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+            }
+          },
+          "required": [
+            "producer_task",
+            "output_name"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "prerequisite": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "class": {
+          "enum": [
+            "contract",
+            "implementation",
+            "acceptance",
+            "context"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/input_source"
+        },
+        "required_gates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "name",
+        "class",
+        "source",
+        "required_gates",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "workspace_policy": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "isolated-write",
+            "read-only",
+            "none"
+          ]
+        },
+        "read_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "write_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "protected_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "mode",
+        "read_paths",
+        "write_paths",
+        "protected_paths"
+      ],
+      "additionalProperties": false
+    },
+    "resource": {
+      "type": "object",
+      "properties": {
+        "resource_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "access": {
+          "enum": [
+            "shared",
+            "exclusive"
+          ]
+        },
+        "scope": {
+          "enum": [
+            "workspace",
+            "project",
+            "external"
+          ]
+        }
+      },
+      "required": [
+        "resource_id",
+        "access",
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "output_spec": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "artifact_type": {
+          "enum": [
+            "requirements",
+            "contract",
+            "plan",
+            "source",
+            "test-suite",
+            "build",
+            "evidence",
+            "report",
+            "diagnosis",
+            "change-request",
+            "decision",
+            "integration-manifest",
+            "release-manifest",
+            "log",
+            "fixture",
+            "policy",
+            "environment",
+            "baseline",
+            "packet",
+            "attestation",
+            "event",
+            "dispatch",
+            "result"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "artifact_type",
+        "required"
+      ],
+      "additionalProperties": false
+    },
+    "recovery": {
+      "type": "object",
+      "properties": {
+        "checkpoint_uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retry_limit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "escalate_on": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "checkpoint_uri",
+        "retry_limit",
+        "escalate_on"
+      ],
+      "additionalProperties": false
+    },
+    "packet": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cdag/1.0"
+        },
+        "kind": {
+          "const": "packet"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "packet_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "graph_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "role": {
+          "enum": [
+            "architect",
+            "orchestrator",
+            "domain-lead",
+            "scheduler",
+            "implementer",
+            "reviewer",
+            "verifier",
+            "integrator",
+            "diagnostician"
+          ]
+        },
+        "group_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parent_task": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+          },
+          "minItems": 0
+        },
+        "prerequisites": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/prerequisite"
+          },
+          "minItems": 0
+        },
+        "baseline_input": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "workspace_policy": {
+          "$ref": "#/$defs/workspace_policy"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resource"
+          },
+          "minItems": 0
+        },
+        "requested_capabilities": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "read_artifacts",
+              "write_artifacts",
+              "emit_result",
+              "edit_workspace",
+              "run_commands",
+              "propose_graph",
+              "propose_contract",
+              "request_dispatch",
+              "apply_graph",
+              "record_event",
+              "lease_work",
+              "issue_attestation",
+              "publish_baseline",
+              "deploy"
+            ]
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "delegation": {
+          "enum": [
+            "none",
+            "propose",
+            "runtime"
+          ]
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/output_spec"
+          },
+          "minItems": 1
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          },
+          "minItems": 0
+        },
+        "acceptance_policy": {
+          "$ref": "#/$defs/artifact_ref"
+        },
+        "recovery": {
+          "$ref": "#/$defs/recovery"
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "project_id",
+        "task_id",
+        "packet_revision",
+        "graph_revision",
+        "role",
+        "group_id",
+        "parent_task",
+        "objective",
+        "requirement_ids",
+        "prerequisites",
+        "baseline_input",
+        "workspace_policy",
+        "resources",
+        "requested_capabilities",
+        "delegation",
+        "outputs",
+        "checks",
+        "acceptance_policy",
+        "recovery"
+      ],
+      "additionalProperties": false
+    },
+    "dispatch": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cdag/1.0"
+        },
+        "kind": {
+          "const": "dispatch"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "dispatch_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "attempt_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "packet": {
+          "$ref": "#/$defs/packet"
+        },
+        "packet_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "recipient": {
+          "type": "object",
+          "properties": {
+            "agent_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+            },
+            "role": {
+              "enum": [
+                "architect",
+                "orchestrator",
+                "domain-lead",
+                "scheduler",
+                "implementer",
+                "reviewer",
+                "verifier",
+                "integrator",
+                "diagnostician"
+              ]
+            },
+            "skill": {
+              "type": "string",
+              "minLength": 1
+            },
+            "model": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "agent_id",
+            "role",
+            "skill",
+            "model"
+          ],
+          "additionalProperties": false
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lease": {
+          "type": "object",
+          "properties": {
+            "lease_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+            },
+            "fence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expires_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "lease_id",
+            "fence",
+            "expires_at"
+          ],
+          "additionalProperties": false
+        },
+        "workspace": {
+          "type": "object",
+          "properties": {
+            "uri": {
+              "type": "string",
+              "minLength": 1
+            },
+            "baseline": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/artifact_ref"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "uri",
+            "baseline"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+              },
+              "artifact": {
+                "$ref": "#/$defs/artifact_ref"
+              },
+              "attestations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/artifact_ref"
+                },
+                "minItems": 0
+              }
+            },
+            "required": [
+              "name",
+              "artifact",
+              "attestations"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "grant": {
+          "type": "object",
+          "properties": {
+            "capabilities": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "read_artifacts",
+                  "write_artifacts",
+                  "emit_result",
+                  "edit_workspace",
+                  "run_commands",
+                  "propose_graph",
+                  "propose_contract",
+                  "request_dispatch",
+                  "apply_graph",
+                  "record_event",
+                  "lease_work",
+                  "issue_attestation",
+                  "publish_baseline",
+                  "deploy"
+                ]
+              },
+              "minItems": 0,
+              "uniqueItems": true
+            },
+            "grant_ref": {
+              "$ref": "#/$defs/artifact_ref"
+            }
+          },
+          "required": [
+            "capabilities",
+            "grant_ref"
+          ],
+          "additionalProperties": false
+        },
+        "result_uri": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "project_id",
+        "dispatch_id",
+        "attempt_id",
+        "packet",
+        "packet_sha256",
+        "recipient",
+        "issued_at",
+        "lease",
+        "workspace",
+        "inputs",
+        "grant",
+        "result_uri"
+      ],
+      "additionalProperties": false
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cdag/1.0"
+        },
+        "kind": {
+          "const": "result"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "dispatch_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "attempt_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "packet_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "packet_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "lease_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "fence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "agent_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "role": {
+          "enum": [
+            "architect",
+            "orchestrator",
+            "domain-lead",
+            "scheduler",
+            "implementer",
+            "reviewer",
+            "verifier",
+            "integrator",
+            "diagnostician"
+          ]
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "blocked",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finished_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+              },
+              "artifact": {
+                "$ref": "#/$defs/artifact_ref"
+              }
+            },
+            "required": [
+              "name",
+              "artifact"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact_ref"
+          },
+          "minItems": 0
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          },
+          "minItems": 0
+        },
+        "change_requests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact_ref"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "project_id",
+        "dispatch_id",
+        "attempt_id",
+        "task_id",
+        "packet_revision",
+        "packet_sha256",
+        "lease_id",
+        "fence",
+        "agent_id",
+        "role",
+        "status",
+        "started_at",
+        "finished_at",
+        "summary",
+        "outputs",
+        "evidence",
+        "issues",
+        "change_requests"
+      ],
+      "additionalProperties": false
+    },
+    "artifact": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cdag/1.0"
+        },
+        "kind": {
+          "const": "artifact"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "artifact_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "artifact_type": {
+          "enum": [
+            "requirements",
+            "contract",
+            "plan",
+            "source",
+            "test-suite",
+            "build",
+            "evidence",
+            "report",
+            "diagnosis",
+            "change-request",
+            "decision",
+            "integration-manifest",
+            "release-manifest",
+            "log",
+            "fixture",
+            "policy",
+            "environment",
+            "baseline",
+            "packet",
+            "attestation",
+            "event",
+            "dispatch",
+            "result"
+          ]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "producer": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+                },
+                "attempt_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+                },
+                "dispatch_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+                }
+              },
+              "required": [
+                "task_id",
+                "attempt_id",
+                "dispatch_id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_revision": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "project_id",
+        "artifact_id",
+        "artifact_type",
+        "sha256",
+        "uri",
+        "authors",
+        "producer",
+        "source_revision",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cdag/1.0"
+        },
+        "kind": {
+          "const": "evidence"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "evidence_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "issuer": {
+          "$ref": "#/$defs/issuer"
+        },
+        "dispatch_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "attempt_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "check_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "subject": {
+          "$ref": "#/$defs/artifact_ref"
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "method": {
+          "enum": [
+            "analysis",
+            "test",
+            "review",
+            "build",
+            "integration",
+            "approval"
+          ]
+        },
+        "verdict": {
+          "enum": [
+            "pass",
+            "fail",
+            "inconclusive"
+          ]
+        },
+        "command": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exit_code": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "report": {
+          "$ref": "#/$defs/artifact_ref"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          },
+          "minItems": 0
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "project_id",
+        "evidence_id",
+        "issuer",
+        "dispatch_id",
+        "attempt_id",
+        "check_id",
+        "subject",
+        "context",
+        "method",
+        "verdict",
+        "command",
+        "exit_code",
+        "report",
+        "issues",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "attestation": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cdag/1.0"
+        },
+        "kind": {
+          "const": "attestation"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "attestation_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "issuer": {
+          "type": "object",
+          "properties": {
+            "agent_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+            },
+            "role": {
+              "const": "scheduler"
+            }
+          },
+          "required": [
+            "agent_id",
+            "role"
+          ],
+          "additionalProperties": false
+        },
+        "subject": {
+          "$ref": "#/$defs/artifact_ref"
+        },
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "gate_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact_ref"
+          },
+          "minItems": 1
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "project_id",
+        "attestation_id",
+        "issuer",
+        "subject",
+        "context",
+        "gate_id",
+        "evidence",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cdag/1.0"
+        },
+        "kind": {
+          "const": "policy"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "policy_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "owner": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "gates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "gate_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+              },
+              "subject_type": {
+                "enum": [
+                  "requirements",
+                  "contract",
+                  "plan",
+                  "source",
+                  "test-suite",
+                  "build",
+                  "evidence",
+                  "report",
+                  "diagnosis",
+                  "change-request",
+                  "decision",
+                  "integration-manifest",
+                  "release-manifest",
+                  "log",
+                  "fixture",
+                  "policy",
+                  "environment",
+                  "baseline",
+                  "packet",
+                  "attestation",
+                  "event",
+                  "dispatch",
+                  "result"
+                ]
+              },
+              "required_checks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "check_id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+                    },
+                    "allowed_roles": {
+                      "type": "array",
+                      "items": {
+                        "enum": [
+                          "architect",
+                          "orchestrator",
+                          "domain-lead",
+                          "scheduler",
+                          "implementer",
+                          "reviewer",
+                          "verifier",
+                          "integrator",
+                          "diagnostician"
+                        ]
+                      },
+                      "minItems": 1,
+                      "uniqueItems": true
+                    },
+                    "independent": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "check_id",
+                    "allowed_roles",
+                    "independent"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              },
+              "consumption_scope": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "gate_id",
+              "subject_type",
+              "required_checks",
+              "consumption_scope"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "release_authority": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "project_id",
+        "policy_id",
+        "revision",
+        "owner",
+        "gates",
+        "release_authority"
+      ],
+      "additionalProperties": false
+    },
+    "graph": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cdag/1.0"
+        },
+        "kind": {
+          "const": "graph"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "graph_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "graph_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "requirement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "acceptance_policy": {
+          "$ref": "#/$defs/artifact_ref"
+        },
+        "external_artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact_ref"
+          },
+          "minItems": 0
+        },
+        "tasks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/packet"
+          },
+          "minItems": 1
+        },
+        "coverage": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "requirement_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+              },
+              "implementation_tasks": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "acceptance_tasks": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "requirement_id",
+              "implementation_tasks",
+              "acceptance_tasks"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "release_tasks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "project_id",
+        "graph_id",
+        "graph_revision",
+        "requirement_ids",
+        "acceptance_policy",
+        "external_artifacts",
+        "tasks",
+        "coverage",
+        "release_tasks"
+      ],
+      "additionalProperties": false
+    },
+    "change_request": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cdag/1.0"
+        },
+        "kind": {
+          "const": "change-request"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "change_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "origin": {
+          "$ref": "#/$defs/issuer"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "target_type": {
+          "enum": [
+            "graph",
+            "packet",
+            "contract",
+            "authority"
+          ]
+        },
+        "target": {
+          "$ref": "#/$defs/artifact_ref"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proposal": {
+          "$ref": "#/$defs/artifact_ref"
+        },
+        "affected_tasks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+          },
+          "minItems": 0
+        },
+        "owner_role": {
+          "enum": [
+            "architect",
+            "orchestrator",
+            "domain-lead",
+            "human"
+          ]
+        },
+        "revalidation": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "project_id",
+        "change_id",
+        "origin",
+        "task_id",
+        "target_type",
+        "target",
+        "reason",
+        "proposal",
+        "affected_tasks",
+        "owner_role",
+        "revalidation"
+      ],
+      "additionalProperties": false
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cdag/1.0"
+        },
+        "kind": {
+          "const": "event"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "event_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        },
+        "event_type": {
+          "enum": [
+            "task.leased",
+            "result.received",
+            "artifact.registered",
+            "evidence.registered",
+            "attestation.issued",
+            "attestation.revoked",
+            "graph.revised",
+            "attempt.cancelled",
+            "publication.requested",
+            "publication.committed",
+            "capability.unavailable"
+          ]
+        },
+        "emitter": {
+          "$ref": "#/$defs/issuer"
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "task_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attempt_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "payload": {
+          "$ref": "#/$defs/artifact_ref"
+        },
+        "causation_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "idempotency_key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+        }
+      },
+      "required": [
+        "protocol",
+        "kind",
+        "project_id",
+        "event_id",
+        "event_type",
+        "emitter",
+        "occurred_at",
+        "task_id",
+        "attempt_id",
+        "payload",
+        "causation_id",
+        "idempotency_key"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

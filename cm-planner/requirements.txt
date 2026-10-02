@@ -1,0 +1,3 @@
+# Validation tools only. Install in an isolated Python 3.10+ environment.
+jsonschema>=4.18,<5
+PyYAML>=6,<7

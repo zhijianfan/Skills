@@ -1,0 +1,1077 @@
+{
+  "protocol": "cdag/1.0",
+  "kind": "graph",
+  "project_id": "inventory-demo",
+  "example": true,
+  "graph_id": "inventory-delivery",
+  "graph_revision": 1,
+  "requirement_ids": [
+    "INV-READ",
+    "UI-LIST"
+  ],
+  "acceptance_policy": {
+    "artifact_id": "policy.v1",
+    "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+  },
+  "external_artifacts": [
+    {
+      "artifact_id": "requirements",
+      "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+    },
+    {
+      "artifact_id": "baseline",
+      "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+    },
+    {
+      "artifact_id": "environment",
+      "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+    },
+    {
+      "artifact_id": "inventory-api.v1",
+      "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+    },
+    {
+      "artifact_id": "policy.v1",
+      "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+    }
+  ],
+  "tasks": [
+    {
+      "protocol": "cdag/1.0",
+      "kind": "packet",
+      "project_id": "inventory-demo",
+      "example": true,
+      "task_id": "contract.review",
+      "packet_revision": 1,
+      "graph_revision": 1,
+      "role": "reviewer",
+      "group_id": null,
+      "parent_task": null,
+      "objective": "Review inventory API semantics against INV-READ and UI-LIST; return scoped evidence.",
+      "requirement_ids": [
+        "INV-READ"
+      ],
+      "prerequisites": [
+        {
+          "name": "subject",
+          "class": "contract",
+          "source": {
+            "artifact": {
+              "artifact_id": "inventory-api.v1",
+              "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+            }
+          },
+          "required_gates": [],
+          "reason": "subject provides the explicit pinned contract prerequisite for this activity."
+        },
+        {
+          "name": "baseline",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "baseline",
+              "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+            }
+          },
+          "required_gates": [],
+          "reason": "baseline provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "requirements",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "requirements",
+              "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+            }
+          },
+          "required_gates": [],
+          "reason": "requirements provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "environment",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "environment",
+              "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+            }
+          },
+          "required_gates": [],
+          "reason": "environment provides the explicit pinned context prerequisite for this activity."
+        }
+      ],
+      "baseline_input": "baseline",
+      "workspace_policy": {
+        "mode": "read-only",
+        "read_paths": [
+          "contracts/**",
+          "src/**",
+          "tests/**"
+        ],
+        "write_paths": [],
+        "protected_paths": [
+          "contracts/**"
+        ]
+      },
+      "resources": [],
+      "requested_capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result"
+      ],
+      "delegation": "none",
+      "outputs": [
+        {
+          "name": "report",
+          "artifact_type": "report",
+          "required": true
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "contract-review",
+          "method": "review",
+          "subject": "input:subject",
+          "command": null,
+          "expected": "Check the named contract/requirement behavior on this exact subject; example commands require real repository adaptation.",
+          "required": true
+        }
+      ],
+      "acceptance_policy": {
+        "artifact_id": "policy.v1",
+        "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+      },
+      "recovery": {
+        "checkpoint_uri": "workspace://contract.review/checkpoint.md",
+        "retry_limit": 2,
+        "escalate_on": [
+          "Input unavailable or revoked",
+          "No progress across materially distinct attempts"
+        ]
+      }
+    },
+    {
+      "protocol": "cdag/1.0",
+      "kind": "packet",
+      "project_id": "inventory-demo",
+      "example": true,
+      "task_id": "inventory.implement",
+      "packet_revision": 1,
+      "graph_revision": 1,
+      "role": "implementer",
+      "group_id": "inventory",
+      "parent_task": null,
+      "objective": "Implement inventory read normal, empty, and unavailable behavior without mutations.",
+      "requirement_ids": [
+        "INV-READ"
+      ],
+      "prerequisites": [
+        {
+          "name": "api",
+          "class": "contract",
+          "source": {
+            "artifact": {
+              "artifact_id": "inventory-api.v1",
+              "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+            }
+          },
+          "required_gates": [
+            "contract.accepted"
+          ],
+          "reason": "api provides the explicit pinned contract prerequisite for this activity."
+        },
+        {
+          "name": "baseline",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "baseline",
+              "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+            }
+          },
+          "required_gates": [],
+          "reason": "baseline provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "requirements",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "requirements",
+              "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+            }
+          },
+          "required_gates": [],
+          "reason": "requirements provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "environment",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "environment",
+              "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+            }
+          },
+          "required_gates": [],
+          "reason": "environment provides the explicit pinned context prerequisite for this activity."
+        }
+      ],
+      "baseline_input": "baseline",
+      "workspace_policy": {
+        "mode": "isolated-write",
+        "read_paths": [
+          "contracts/**",
+          "src/**",
+          "tests/**"
+        ],
+        "write_paths": [
+          "src/inventory/**",
+          "tests/inventory/**"
+        ],
+        "protected_paths": [
+          "contracts/**"
+        ]
+      },
+      "resources": [],
+      "requested_capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "edit_workspace",
+        "run_commands"
+      ],
+      "delegation": "none",
+      "outputs": [
+        {
+          "name": "source",
+          "artifact_type": "source",
+          "required": true
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "local-unit",
+          "method": "test",
+          "subject": "output:source",
+          "command": "python -m unittest discover -s tests/inventory",
+          "expected": "Check the named contract/requirement behavior on this exact subject; example commands require real repository adaptation.",
+          "required": true
+        }
+      ],
+      "acceptance_policy": {
+        "artifact_id": "policy.v1",
+        "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+      },
+      "recovery": {
+        "checkpoint_uri": "workspace://inventory.implement/checkpoint.md",
+        "retry_limit": 2,
+        "escalate_on": [
+          "Input unavailable or revoked",
+          "No progress across materially distinct attempts"
+        ]
+      }
+    },
+    {
+      "protocol": "cdag/1.0",
+      "kind": "packet",
+      "project_id": "inventory-demo",
+      "example": true,
+      "task_id": "inventory.review",
+      "packet_revision": 1,
+      "graph_revision": 1,
+      "role": "reviewer",
+      "group_id": "inventory",
+      "parent_task": null,
+      "objective": "Review immutable inventory implementation for contract and requirement compliance.",
+      "requirement_ids": [
+        "INV-READ"
+      ],
+      "prerequisites": [
+        {
+          "name": "subject",
+          "class": "implementation",
+          "source": {
+            "producer_task": "inventory.implement",
+            "output_name": "source"
+          },
+          "required_gates": [],
+          "reason": "subject provides the explicit pinned implementation prerequisite for this activity."
+        },
+        {
+          "name": "api",
+          "class": "contract",
+          "source": {
+            "artifact": {
+              "artifact_id": "inventory-api.v1",
+              "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+            }
+          },
+          "required_gates": [
+            "contract.accepted"
+          ],
+          "reason": "api provides the explicit pinned contract prerequisite for this activity."
+        },
+        {
+          "name": "baseline",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "baseline",
+              "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+            }
+          },
+          "required_gates": [],
+          "reason": "baseline provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "requirements",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "requirements",
+              "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+            }
+          },
+          "required_gates": [],
+          "reason": "requirements provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "environment",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "environment",
+              "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+            }
+          },
+          "required_gates": [],
+          "reason": "environment provides the explicit pinned context prerequisite for this activity."
+        }
+      ],
+      "baseline_input": "baseline",
+      "workspace_policy": {
+        "mode": "read-only",
+        "read_paths": [
+          "contracts/**",
+          "src/**",
+          "tests/**"
+        ],
+        "write_paths": [],
+        "protected_paths": [
+          "contracts/**"
+        ]
+      },
+      "resources": [],
+      "requested_capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result"
+      ],
+      "delegation": "none",
+      "outputs": [
+        {
+          "name": "report",
+          "artifact_type": "report",
+          "required": true
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "spec-quality",
+          "method": "review",
+          "subject": "input:subject",
+          "command": null,
+          "expected": "Check the named contract/requirement behavior on this exact subject; example commands require real repository adaptation.",
+          "required": true
+        }
+      ],
+      "acceptance_policy": {
+        "artifact_id": "policy.v1",
+        "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+      },
+      "recovery": {
+        "checkpoint_uri": "workspace://inventory.review/checkpoint.md",
+        "retry_limit": 2,
+        "escalate_on": [
+          "Input unavailable or revoked",
+          "No progress across materially distinct attempts"
+        ]
+      }
+    },
+    {
+      "protocol": "cdag/1.0",
+      "kind": "packet",
+      "project_id": "inventory-demo",
+      "example": true,
+      "task_id": "inventory.verify",
+      "packet_revision": 1,
+      "graph_revision": 1,
+      "role": "verifier",
+      "group_id": "inventory",
+      "parent_task": null,
+      "objective": "Run contract checks on the real inventory-read implementation.",
+      "requirement_ids": [
+        "INV-READ"
+      ],
+      "prerequisites": [
+        {
+          "name": "subject",
+          "class": "implementation",
+          "source": {
+            "producer_task": "inventory.implement",
+            "output_name": "source"
+          },
+          "required_gates": [],
+          "reason": "subject provides the explicit pinned implementation prerequisite for this activity."
+        },
+        {
+          "name": "api",
+          "class": "contract",
+          "source": {
+            "artifact": {
+              "artifact_id": "inventory-api.v1",
+              "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+            }
+          },
+          "required_gates": [
+            "contract.accepted"
+          ],
+          "reason": "api provides the explicit pinned contract prerequisite for this activity."
+        },
+        {
+          "name": "baseline",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "baseline",
+              "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+            }
+          },
+          "required_gates": [],
+          "reason": "baseline provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "requirements",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "requirements",
+              "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+            }
+          },
+          "required_gates": [],
+          "reason": "requirements provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "environment",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "environment",
+              "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+            }
+          },
+          "required_gates": [],
+          "reason": "environment provides the explicit pinned context prerequisite for this activity."
+        }
+      ],
+      "baseline_input": "baseline",
+      "workspace_policy": {
+        "mode": "read-only",
+        "read_paths": [
+          "contracts/**",
+          "src/**",
+          "tests/**"
+        ],
+        "write_paths": [],
+        "protected_paths": [
+          "contracts/**"
+        ]
+      },
+      "resources": [],
+      "requested_capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "run_commands"
+      ],
+      "delegation": "none",
+      "outputs": [
+        {
+          "name": "report",
+          "artifact_type": "report",
+          "required": true
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "contract-tests",
+          "method": "test",
+          "subject": "input:subject",
+          "command": "python -m unittest tests.test_inventory_contract",
+          "expected": "Check the named contract/requirement behavior on this exact subject; example commands require real repository adaptation.",
+          "required": true
+        }
+      ],
+      "acceptance_policy": {
+        "artifact_id": "policy.v1",
+        "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+      },
+      "recovery": {
+        "checkpoint_uri": "workspace://inventory.verify/checkpoint.md",
+        "retry_limit": 2,
+        "escalate_on": [
+          "Input unavailable or revoked",
+          "No progress across materially distinct attempts"
+        ]
+      }
+    },
+    {
+      "protocol": "cdag/1.0",
+      "kind": "packet",
+      "project_id": "inventory-demo",
+      "example": true,
+      "task_id": "inventory.integrate",
+      "packet_revision": 1,
+      "graph_revision": 1,
+      "role": "integrator",
+      "group_id": "inventory",
+      "parent_task": null,
+      "objective": "Prepare a compatible inventory-service combination candidate.",
+      "requirement_ids": [
+        "INV-READ"
+      ],
+      "prerequisites": [
+        {
+          "name": "subject",
+          "class": "implementation",
+          "source": {
+            "producer_task": "inventory.implement",
+            "output_name": "source"
+          },
+          "required_gates": [
+            "source.accepted"
+          ],
+          "reason": "subject provides the explicit pinned implementation prerequisite for this activity."
+        },
+        {
+          "name": "api",
+          "class": "contract",
+          "source": {
+            "artifact": {
+              "artifact_id": "inventory-api.v1",
+              "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+            }
+          },
+          "required_gates": [
+            "contract.accepted"
+          ],
+          "reason": "api provides the explicit pinned contract prerequisite for this activity."
+        },
+        {
+          "name": "baseline",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "baseline",
+              "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+            }
+          },
+          "required_gates": [],
+          "reason": "baseline provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "requirements",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "requirements",
+              "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+            }
+          },
+          "required_gates": [],
+          "reason": "requirements provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "environment",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "environment",
+              "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+            }
+          },
+          "required_gates": [],
+          "reason": "environment provides the explicit pinned context prerequisite for this activity."
+        }
+      ],
+      "baseline_input": "baseline",
+      "workspace_policy": {
+        "mode": "isolated-write",
+        "read_paths": [
+          "contracts/**",
+          "src/**",
+          "tests/**"
+        ],
+        "write_paths": [
+          "src/inventory/**",
+          "tests/inventory/**"
+        ],
+        "protected_paths": [
+          "contracts/**"
+        ]
+      },
+      "resources": [],
+      "requested_capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "edit_workspace",
+        "run_commands"
+      ],
+      "delegation": "none",
+      "outputs": [
+        {
+          "name": "combined",
+          "artifact_type": "integration-manifest",
+          "required": true
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "combine-build",
+          "method": "build",
+          "subject": "output:combined",
+          "command": "python -m compileall src",
+          "expected": "Check the named contract/requirement behavior on this exact subject; example commands require real repository adaptation.",
+          "required": true
+        }
+      ],
+      "acceptance_policy": {
+        "artifact_id": "policy.v1",
+        "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+      },
+      "recovery": {
+        "checkpoint_uri": "workspace://inventory.integrate/checkpoint.md",
+        "retry_limit": 2,
+        "escalate_on": [
+          "Input unavailable or revoked",
+          "No progress across materially distinct attempts"
+        ]
+      }
+    },
+    {
+      "protocol": "cdag/1.0",
+      "kind": "packet",
+      "project_id": "inventory-demo",
+      "example": true,
+      "task_id": "ui.implement",
+      "packet_revision": 1,
+      "graph_revision": 1,
+      "role": "implementer",
+      "group_id": null,
+      "parent_task": null,
+      "objective": "Implement inventory list, empty state, and unavailable state against API fixtures.",
+      "requirement_ids": [
+        "UI-LIST"
+      ],
+      "prerequisites": [
+        {
+          "name": "api",
+          "class": "contract",
+          "source": {
+            "artifact": {
+              "artifact_id": "inventory-api.v1",
+              "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+            }
+          },
+          "required_gates": [
+            "contract.accepted"
+          ],
+          "reason": "api provides the explicit pinned contract prerequisite for this activity."
+        },
+        {
+          "name": "baseline",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "baseline",
+              "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+            }
+          },
+          "required_gates": [],
+          "reason": "baseline provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "requirements",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "requirements",
+              "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+            }
+          },
+          "required_gates": [],
+          "reason": "requirements provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "environment",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "environment",
+              "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+            }
+          },
+          "required_gates": [],
+          "reason": "environment provides the explicit pinned context prerequisite for this activity."
+        }
+      ],
+      "baseline_input": "baseline",
+      "workspace_policy": {
+        "mode": "isolated-write",
+        "read_paths": [
+          "contracts/**",
+          "src/**",
+          "tests/**"
+        ],
+        "write_paths": [
+          "src/ui/**",
+          "tests/ui/**"
+        ],
+        "protected_paths": [
+          "contracts/**"
+        ]
+      },
+      "resources": [],
+      "requested_capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "edit_workspace",
+        "run_commands"
+      ],
+      "delegation": "none",
+      "outputs": [
+        {
+          "name": "source",
+          "artifact_type": "source",
+          "required": true
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "local-unit",
+          "method": "test",
+          "subject": "output:source",
+          "command": "python -m unittest discover -s tests/ui",
+          "expected": "Check the named contract/requirement behavior on this exact subject; example commands require real repository adaptation.",
+          "required": true
+        }
+      ],
+      "acceptance_policy": {
+        "artifact_id": "policy.v1",
+        "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+      },
+      "recovery": {
+        "checkpoint_uri": "workspace://ui.implement/checkpoint.md",
+        "retry_limit": 2,
+        "escalate_on": [
+          "Input unavailable or revoked",
+          "No progress across materially distinct attempts"
+        ]
+      }
+    },
+    {
+      "protocol": "cdag/1.0",
+      "kind": "packet",
+      "project_id": "inventory-demo",
+      "example": true,
+      "task_id": "product.combine",
+      "packet_revision": 1,
+      "graph_revision": 1,
+      "role": "integrator",
+      "group_id": null,
+      "parent_task": null,
+      "objective": "Combine inventory service and UI into an identified integration manifest.",
+      "requirement_ids": [
+        "INV-READ",
+        "UI-LIST"
+      ],
+      "prerequisites": [
+        {
+          "name": "inventory",
+          "class": "implementation",
+          "source": {
+            "producer_task": "inventory.integrate",
+            "output_name": "combined"
+          },
+          "required_gates": [],
+          "reason": "inventory provides the explicit pinned implementation prerequisite for this activity."
+        },
+        {
+          "name": "ui",
+          "class": "implementation",
+          "source": {
+            "producer_task": "ui.implement",
+            "output_name": "source"
+          },
+          "required_gates": [
+            "source.local"
+          ],
+          "reason": "ui provides the explicit pinned implementation prerequisite for this activity."
+        },
+        {
+          "name": "api",
+          "class": "contract",
+          "source": {
+            "artifact": {
+              "artifact_id": "inventory-api.v1",
+              "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+            }
+          },
+          "required_gates": [
+            "contract.accepted"
+          ],
+          "reason": "api provides the explicit pinned contract prerequisite for this activity."
+        },
+        {
+          "name": "baseline",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "baseline",
+              "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+            }
+          },
+          "required_gates": [],
+          "reason": "baseline provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "requirements",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "requirements",
+              "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+            }
+          },
+          "required_gates": [],
+          "reason": "requirements provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "environment",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "environment",
+              "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+            }
+          },
+          "required_gates": [],
+          "reason": "environment provides the explicit pinned context prerequisite for this activity."
+        }
+      ],
+      "baseline_input": "baseline",
+      "workspace_policy": {
+        "mode": "isolated-write",
+        "read_paths": [
+          "contracts/**",
+          "src/**",
+          "tests/**"
+        ],
+        "write_paths": [
+          "src/inventory/**",
+          "src/ui/**",
+          "tests/**"
+        ],
+        "protected_paths": [
+          "contracts/**"
+        ]
+      },
+      "resources": [],
+      "requested_capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "edit_workspace",
+        "run_commands"
+      ],
+      "delegation": "none",
+      "outputs": [
+        {
+          "name": "combined",
+          "artifact_type": "integration-manifest",
+          "required": true
+        }
+      ],
+      "checks": [],
+      "acceptance_policy": {
+        "artifact_id": "policy.v1",
+        "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+      },
+      "recovery": {
+        "checkpoint_uri": "workspace://product.combine/checkpoint.md",
+        "retry_limit": 2,
+        "escalate_on": [
+          "Input unavailable or revoked",
+          "No progress across materially distinct attempts"
+        ]
+      }
+    },
+    {
+      "protocol": "cdag/1.0",
+      "kind": "packet",
+      "project_id": "inventory-demo",
+      "example": true,
+      "task_id": "product.verify",
+      "packet_revision": 1,
+      "graph_revision": 1,
+      "role": "verifier",
+      "group_id": null,
+      "parent_task": null,
+      "objective": "Run normal, empty, and unavailable end-to-end checks on real integrated components.",
+      "requirement_ids": [
+        "INV-READ",
+        "UI-LIST"
+      ],
+      "prerequisites": [
+        {
+          "name": "subject",
+          "class": "implementation",
+          "source": {
+            "producer_task": "product.combine",
+            "output_name": "combined"
+          },
+          "required_gates": [],
+          "reason": "subject provides the explicit pinned implementation prerequisite for this activity."
+        },
+        {
+          "name": "api",
+          "class": "contract",
+          "source": {
+            "artifact": {
+              "artifact_id": "inventory-api.v1",
+              "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+            }
+          },
+          "required_gates": [
+            "contract.accepted"
+          ],
+          "reason": "api provides the explicit pinned contract prerequisite for this activity."
+        },
+        {
+          "name": "baseline",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "baseline",
+              "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+            }
+          },
+          "required_gates": [],
+          "reason": "baseline provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "requirements",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "requirements",
+              "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+            }
+          },
+          "required_gates": [],
+          "reason": "requirements provides the explicit pinned context prerequisite for this activity."
+        },
+        {
+          "name": "environment",
+          "class": "context",
+          "source": {
+            "artifact": {
+              "artifact_id": "environment",
+              "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+            }
+          },
+          "required_gates": [],
+          "reason": "environment provides the explicit pinned context prerequisite for this activity."
+        }
+      ],
+      "baseline_input": "baseline",
+      "workspace_policy": {
+        "mode": "read-only",
+        "read_paths": [
+          "contracts/**",
+          "src/**",
+          "tests/**"
+        ],
+        "write_paths": [],
+        "protected_paths": [
+          "contracts/**"
+        ]
+      },
+      "resources": [],
+      "requested_capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "run_commands"
+      ],
+      "delegation": "none",
+      "outputs": [
+        {
+          "name": "report",
+          "artifact_type": "report",
+          "required": true
+        }
+      ],
+      "checks": [
+        {
+          "check_id": "product-e2e",
+          "method": "integration",
+          "subject": "input:subject",
+          "command": "python -m unittest discover -s tests/e2e",
+          "expected": "Check the named contract/requirement behavior on this exact subject; example commands require real repository adaptation.",
+          "required": true
+        }
+      ],
+      "acceptance_policy": {
+        "artifact_id": "policy.v1",
+        "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+      },
+      "recovery": {
+        "checkpoint_uri": "workspace://product.verify/checkpoint.md",
+        "retry_limit": 2,
+        "escalate_on": [
+          "Input unavailable or revoked",
+          "No progress across materially distinct attempts"
+        ]
+      }
+    }
+  ],
+  "coverage": [
+    {
+      "requirement_id": "INV-READ",
+      "implementation_tasks": [
+        "inventory.implement"
+      ],
+      "acceptance_tasks": [
+        "product.verify"
+      ]
+    },
+    {
+      "requirement_id": "UI-LIST",
+      "implementation_tasks": [
+        "ui.implement"
+      ],
+      "acceptance_tasks": [
+        "product.verify"
+      ]
+    }
+  ],
+  "release_tasks": [
+    "product.verify"
+  ]
+}

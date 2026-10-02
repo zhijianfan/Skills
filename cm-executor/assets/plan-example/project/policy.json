@@ -1,0 +1,82 @@
+{
+  "protocol": "cdag/1.0",
+  "kind": "policy",
+  "project_id": "inventory-demo",
+  "example": true,
+  "policy_id": "policy.v1",
+  "revision": 1,
+  "owner": "project-owner",
+  "gates": [
+    {
+      "gate_id": "contract.accepted",
+      "subject_type": "contract",
+      "required_checks": [
+        {
+          "check_id": "contract-review",
+          "allowed_roles": [
+            "reviewer"
+          ],
+          "independent": true
+        }
+      ],
+      "consumption_scope": "Named API v1 semantics for implementation."
+    },
+    {
+      "gate_id": "source.local",
+      "subject_type": "source",
+      "required_checks": [
+        {
+          "check_id": "local-unit",
+          "allowed_roles": [
+            "implementer"
+          ],
+          "independent": false
+        }
+      ],
+      "consumption_scope": "Candidate available for combination under real product checking; not release acceptance."
+    },
+    {
+      "gate_id": "source.accepted",
+      "subject_type": "source",
+      "required_checks": [
+        {
+          "check_id": "spec-quality",
+          "allowed_roles": [
+            "reviewer"
+          ],
+          "independent": true
+        },
+        {
+          "check_id": "contract-tests",
+          "allowed_roles": [
+            "verifier"
+          ],
+          "independent": true
+        },
+        {
+          "check_id": "local-unit",
+          "allowed_roles": [
+            "implementer"
+          ],
+          "independent": false
+        }
+      ],
+      "consumption_scope": "Inventory read source reviewed and checked against API v1, on the pinned baseline."
+    },
+    {
+      "gate_id": "product.accepted",
+      "subject_type": "integration-manifest",
+      "required_checks": [
+        {
+          "check_id": "product-e2e",
+          "allowed_roles": [
+            "verifier"
+          ],
+          "independent": true
+        }
+      ],
+      "consumption_scope": "Exact combined inventory/UI manifest and environment; not deployment permission."
+    }
+  ],
+  "release_authority": "Explicit project-owner authorization is required for external release/deployment."
+}

@@ -1,0 +1,734 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cm:handoff:1.0",
+  "$defs": {
+    "handoff": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cm-plan/1.0"
+        },
+        "profile": {
+          "const": "cm-two-skill/1.0"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "plan-handoff"
+        },
+        "plan_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "parent": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "plan_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "manifest_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "plan_id",
+                "revision",
+                "manifest_sha256"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "contract_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "producer": {
+          "type": "object",
+          "properties": {
+            "skill": {
+              "const": "cm-planner"
+            },
+            "model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "session_id": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "skill",
+            "model",
+            "session_id"
+          ],
+          "additionalProperties": false
+        },
+        "status": {
+          "enum": [
+            "ready-for-intake",
+            "partial"
+          ]
+        },
+        "summary_path": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "requirements_path": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "graph_path": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "policy_path": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "root_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "artifact_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "artifact_type": {
+                "enum": [
+                  "requirements",
+                  "baseline",
+                  "environment",
+                  "contract",
+                  "policy",
+                  "fixture",
+                  "report",
+                  "source",
+                  "test-suite",
+                  "build"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "sha256",
+              "artifact_type",
+              "path"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "baseline": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "enum": [
+                "git",
+                "new-repository"
+              ]
+            },
+            "repository_hint": {
+              "type": "string",
+              "minLength": 1
+            },
+            "commit": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "dirty_tree_policy": {
+              "enum": [
+                "reject",
+                "explicit-snapshot"
+              ]
+            }
+          },
+          "required": [
+            "mode",
+            "repository_hint",
+            "commit",
+            "dirty_tree_policy"
+          ],
+          "additionalProperties": false
+        },
+        "environment": {
+          "type": "object",
+          "properties": {
+            "required_tools": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "required_features": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "setup_path": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"
+            },
+            "verification_path": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"
+            }
+          },
+          "required": [
+            "required_tools",
+            "required_features",
+            "setup_path",
+            "verification_path"
+          ],
+          "additionalProperties": false
+        },
+        "execution_preferences": {
+          "type": "object",
+          "properties": {
+            "parallelism": {
+              "const": "all-ready"
+            },
+            "manager_layer": {
+              "const": "optional"
+            },
+            "model_policy": {
+              "const": "expected-time-to-accepted-output"
+            },
+            "allow_speculation": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "parallelism",
+            "manager_layer",
+            "model_policy",
+            "allow_speculation"
+          ],
+          "additionalProperties": false
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "resolution": {
+                "enum": [
+                  "settled",
+                  "technical-default",
+                  "requires-decision"
+                ]
+              },
+              "affected_tasks": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+                },
+                "minItems": 0
+              }
+            },
+            "required": [
+              "id",
+              "statement",
+              "resolution",
+              "affected_tasks"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "completion": {
+          "type": "object",
+          "properties": {
+            "product_subject": {
+              "type": "object",
+              "properties": {
+                "producer_task": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+                },
+                "output_name": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+                }
+              },
+              "required": [
+                "producer_task",
+                "output_name"
+              ],
+              "additionalProperties": false
+            },
+            "required_gates": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+              },
+              "minItems": 1
+            },
+            "deployment_authorized": {
+              "const": false
+            }
+          },
+          "required": [
+            "product_subject",
+            "required_gates",
+            "deployment_authorized"
+          ],
+          "additionalProperties": false
+        },
+        "change_control": {
+          "type": "object",
+          "properties": {
+            "local_refinement_allowed": {
+              "type": "boolean"
+            },
+            "shared_contract_changes": {
+              "const": "return-to-planner"
+            },
+            "requirement_changes": {
+              "const": "human-decision"
+            }
+          },
+          "required": [
+            "local_refinement_allowed",
+            "shared_contract_changes",
+            "requirement_changes"
+          ],
+          "additionalProperties": false
+        },
+        "change_summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "protocol",
+        "profile",
+        "project_id",
+        "example",
+        "kind",
+        "plan_id",
+        "revision",
+        "parent",
+        "contract_sha256",
+        "producer",
+        "status",
+        "summary_path",
+        "requirements_path",
+        "graph_path",
+        "policy_path",
+        "files",
+        "root_artifacts",
+        "baseline",
+        "environment",
+        "execution_preferences",
+        "assumptions",
+        "completion",
+        "change_control",
+        "change_summary"
+      ],
+      "additionalProperties": false
+    },
+    "receipt": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cm-plan/1.0"
+        },
+        "profile": {
+          "const": "cm-two-skill/1.0"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "plan-receipt"
+        },
+        "plan": {
+          "type": "object",
+          "properties": {
+            "plan_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "manifest_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "plan_id",
+            "revision",
+            "manifest_sha256"
+          ],
+          "additionalProperties": false
+        },
+        "contract_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "executor_session": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "accepted",
+            "accepted-with-blockers",
+            "rejected"
+          ]
+        },
+        "execution_mode": {
+          "enum": [
+            "native-concurrent",
+            "durable-runtime",
+            "serial",
+            "unavailable"
+          ]
+        },
+        "authorization_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bound_repository": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bound_commit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_tasks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+          },
+          "minItems": 0
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "affected_tasks": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+                },
+                "minItems": 0
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "affected_tasks"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "ledger_location": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "protocol",
+        "profile",
+        "project_id",
+        "example",
+        "kind",
+        "plan",
+        "contract_sha256",
+        "executor_session",
+        "status",
+        "execution_mode",
+        "authorization_ref",
+        "bound_repository",
+        "bound_commit",
+        "blocked_tasks",
+        "issues",
+        "ledger_location"
+      ],
+      "additionalProperties": false
+    },
+    "replan": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "cm-plan/1.0"
+        },
+        "profile": {
+          "const": "cm-two-skill/1.0"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "example": {
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "replan-request"
+        },
+        "request_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "plan": {
+          "type": "object",
+          "properties": {
+            "plan_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "manifest_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "plan_id",
+            "revision",
+            "manifest_sha256"
+          ],
+          "additionalProperties": false
+        },
+        "contract_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "executor_session": {
+          "type": "string",
+          "minLength": 1
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "enum": [
+            "contract-defect",
+            "requirement-ambiguity",
+            "baseline-mismatch",
+            "technical-blocker",
+            "scope-change"
+          ]
+        },
+        "affected_tasks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+          },
+          "minItems": 1
+        },
+        "proposed_change": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preserve_outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "artifact_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "sha256"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "evidence_files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "requested_decision": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "protocol",
+        "profile",
+        "project_id",
+        "example",
+        "kind",
+        "request_id",
+        "plan",
+        "contract_sha256",
+        "executor_session",
+        "question",
+        "reason",
+        "affected_tasks",
+        "proposed_change",
+        "preserve_outputs",
+        "evidence_files",
+        "requested_decision"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/handoff"
+    },
+    {
+      "$ref": "#/$defs/receipt"
+    },
+    {
+      "$ref": "#/$defs/replan"
+    }
+  ]
+}

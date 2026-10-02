@@ -1,0 +1,174 @@
+{
+  "protocol": "cdag/1.0",
+  "roles": {
+    "architect": {
+      "delegation": "propose",
+      "capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "propose_graph",
+        "propose_contract"
+      ],
+      "outputs": [
+        "contract",
+        "plan",
+        "decision",
+        "change-request",
+        "report",
+        "policy"
+      ],
+      "model_hint": "most capable available design model",
+      "skill": "cm-executor"
+    },
+    "orchestrator": {
+      "delegation": "propose",
+      "capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "propose_graph",
+        "request_dispatch"
+      ],
+      "outputs": [
+        "plan",
+        "decision",
+        "change-request",
+        "report"
+      ],
+      "model_hint": "capable coordination model",
+      "skill": "cm-executor"
+    },
+    "domain-lead": {
+      "delegation": "propose",
+      "capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "propose_graph",
+        "propose_contract",
+        "request_dispatch"
+      ],
+      "outputs": [
+        "plan",
+        "packet",
+        "decision",
+        "change-request",
+        "report"
+      ],
+      "model_hint": "capable domain model",
+      "skill": "cm-executor"
+    },
+    "scheduler": {
+      "delegation": "runtime",
+      "capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "apply_graph",
+        "record_event",
+        "lease_work",
+        "issue_attestation",
+        "request_dispatch"
+      ],
+      "outputs": [
+        "event",
+        "attestation",
+        "report"
+      ],
+      "model_hint": "deterministic runtime; model only for adapter setup or exception diagnosis",
+      "skill": "cm-executor"
+    },
+    "implementer": {
+      "delegation": "none",
+      "capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "edit_workspace",
+        "run_commands"
+      ],
+      "outputs": [
+        "source",
+        "test-suite",
+        "build",
+        "report",
+        "log"
+      ],
+      "model_hint": "model minimizing expected time to accepted increment",
+      "skill": "cm-executor"
+    },
+    "reviewer": {
+      "delegation": "none",
+      "capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result"
+      ],
+      "outputs": [
+        "report",
+        "evidence"
+      ],
+      "model_hint": "independent model matched to review risk",
+      "skill": "cm-executor"
+    },
+    "verifier": {
+      "delegation": "none",
+      "capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "run_commands"
+      ],
+      "outputs": [
+        "report",
+        "evidence",
+        "log",
+        "build"
+      ],
+      "model_hint": "deterministic commands; model only for setup and interpretation",
+      "skill": "cm-executor"
+    },
+    "integrator": {
+      "delegation": "none",
+      "capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "edit_workspace",
+        "run_commands",
+        "publish_baseline",
+        "deploy"
+      ],
+      "outputs": [
+        "source",
+        "build",
+        "integration-manifest",
+        "release-manifest",
+        "report",
+        "log"
+      ],
+      "model_hint": "automation for clean combination; capable model for semantic conflicts",
+      "skill": "cm-executor"
+    },
+    "diagnostician": {
+      "delegation": "none",
+      "capabilities": [
+        "read_artifacts",
+        "write_artifacts",
+        "emit_result",
+        "run_commands",
+        "propose_graph",
+        "propose_contract"
+      ],
+      "outputs": [
+        "diagnosis",
+        "change-request",
+        "report",
+        "log"
+      ],
+      "model_hint": "capable reasoning model when failures stop making progress",
+      "skill": "cm-executor"
+    }
+  }
+}

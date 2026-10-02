@@ -1,0 +1,148 @@
+{
+  "protocol": "cm-plan/1.0",
+  "profile": "cm-two-skill/1.0",
+  "kind": "plan-handoff",
+  "project_id": "inventory-demo",
+  "example": true,
+  "plan_id": "inventory-read-ui",
+  "revision": 1,
+  "parent": null,
+  "contract_sha256": "746ad7fa9b1a2bbe1559592cd9a3a65d69ca8fd03dabf96f025618b85e4758cc",
+  "producer": {
+    "skill": "cm-planner",
+    "model": "illustrative-planner-model",
+    "session_id": "separate-planner-session-example"
+  },
+  "status": "ready-for-intake",
+  "summary_path": "project/summary.md",
+  "requirements_path": "project/requirements.md",
+  "graph_path": "project/graph.json",
+  "policy_path": "project/policy.json",
+  "files": [
+    {
+      "path": "project/baseline.md",
+      "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004"
+    },
+    {
+      "path": "project/contracts/inventory-api.md",
+      "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b"
+    },
+    {
+      "path": "project/environment.md",
+      "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95"
+    },
+    {
+      "path": "project/graph.json",
+      "sha256": "394b775fdf294aaf3b1596b33580f51d72a00f5f8a45e3f8774d1bfc320f6659"
+    },
+    {
+      "path": "project/policy.json",
+      "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1"
+    },
+    {
+      "path": "project/requirements.md",
+      "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b"
+    },
+    {
+      "path": "project/setup.md",
+      "sha256": "8d2257d49217eb3351ad199e669f2991649c0bcbcec753ccdc3e7476e8532fa8"
+    },
+    {
+      "path": "project/summary.md",
+      "sha256": "a2ed601ea48cfd8278f178414ed481ad04c65e2647f646383af39ebf69f01488"
+    },
+    {
+      "path": "project/verification.md",
+      "sha256": "75c8d3aa50a3129555bea107f283b771d87151d250bda8a5e9599d3bb6150779"
+    }
+  ],
+  "root_artifacts": [
+    {
+      "artifact_id": "requirements",
+      "sha256": "0c5241bfb7feef04ca86d89a94acabaa648255a36722b7c316e1b56781c3ff7b",
+      "artifact_type": "requirements",
+      "path": "project/requirements.md"
+    },
+    {
+      "artifact_id": "baseline",
+      "sha256": "f8d542bec13ffa9e5d64fb167f8c39dd88e3ec1607f0a4c23c47d7ae01cf9004",
+      "artifact_type": "baseline",
+      "path": "project/baseline.md"
+    },
+    {
+      "artifact_id": "environment",
+      "sha256": "8226ad9d71bc18e9ec263ad5c11a251476cc8bb3a33119065a04e98c3e330b95",
+      "artifact_type": "environment",
+      "path": "project/environment.md"
+    },
+    {
+      "artifact_id": "inventory-api.v1",
+      "sha256": "c1d4f38903d1ee8794bc027e25408f42674627f115abc40b78e0b125a9255f9b",
+      "artifact_type": "contract",
+      "path": "project/contracts/inventory-api.md"
+    },
+    {
+      "artifact_id": "policy.v1",
+      "sha256": "2c74a301811afc2455eab882ca81979e3c7d8f718331d4f484be78b8ebc028b1",
+      "artifact_type": "policy",
+      "path": "project/policy.json"
+    }
+  ],
+  "baseline": {
+    "mode": "git",
+    "repository_hint": "inventory-demo",
+    "commit": "1111111111111111111111111111111111111111",
+    "dirty_tree_policy": "reject"
+  },
+  "environment": {
+    "required_tools": [
+      "project test runner",
+      "version-control client"
+    ],
+    "required_features": [
+      "isolated workspaces",
+      "independent reviewer"
+    ],
+    "setup_path": "project/setup.md",
+    "verification_path": "project/verification.md"
+  },
+  "execution_preferences": {
+    "parallelism": "all-ready",
+    "manager_layer": "optional",
+    "model_policy": "expected-time-to-accepted-output",
+    "allow_speculation": false
+  },
+  "assumptions": [
+    {
+      "id": "EXAMPLE",
+      "statement": "All baselines and commands are synthetic format examples, not inspected repository facts.",
+      "resolution": "settled",
+      "affected_tasks": [
+        "contract.review",
+        "inventory.implement",
+        "inventory.review",
+        "inventory.verify",
+        "inventory.integrate",
+        "ui.implement",
+        "product.combine",
+        "product.verify"
+      ]
+    }
+  ],
+  "completion": {
+    "product_subject": {
+      "producer_task": "product.combine",
+      "output_name": "combined"
+    },
+    "required_gates": [
+      "product.accepted"
+    ],
+    "deployment_authorized": false
+  },
+  "change_control": {
+    "local_refinement_allowed": true,
+    "shared_contract_changes": "return-to-planner",
+    "requirement_changes": "human-decision"
+  },
+  "change_summary": "Initial synthetic format illustration: independent inventory and UI implementation after root contract review."
+}

@@ -1,0 +1,13 @@
+{
+  "profile": "cm-two-skill/1.0",
+  "files": {
+    "assets/handoff.schema.json": "1f81a9da5f2b16b9e6d6d613132eeb6e31445e1754f236b0cfec75a9f0b8bd98",
+    "assets/protocol.schema.json": "62c9991c0c18836213956f0fd5d8585ee1def40b6a91bd2a7d47c60b3fa4f720",
+    "assets/roles.json": "42e90d2892d281ab81306eb88249b970cba205b8df8d0aa89d991ba0170d4b27",
+    "references/HANDOFF.md": "cf20b3db8576c9f07b58a74775eab4adfa1e1f15281533e72b3a7ea26a2cabed",
+    "references/PROTOCOL.md": "10f9b3bf5b2b86b96e0044f6ead697cd66b9142ab7e7092fe04a6f5ff9813e62",
+    "scripts/handoff.py": "0a3cafd1471c7ee35946e722530e1a9e3d596d767783f00dffbc2fa7372b7c09",
+    "scripts/validate.py": "62f9f7f5b2a492959c2ec583f46d0c6747f3a05eaa44112bc2c2baa792731a42"
+  },
+  "sha256": "746ad7fa9b1a2bbe1559592cd9a3a65d69ca8fd03dabf96f025618b85e4758cc"
+}
